@@ -6,7 +6,8 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     Vector3 inputVector = new Vector3(0, 0, 0);
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float moveSpeed = 7f;
+    [SerializeField] private float rotateSpeed = 10f;
 
     // Update is called once per frame
     private void Update()
@@ -32,8 +33,7 @@ public class Player : MonoBehaviour
         inputVector = inputVector.normalized * moveSpeed * Time.deltaTime;
 
         transform.position += inputVector; // move the player in the direction of inputVector
-
-        Debug.Log("DeltaTime: " + Time.deltaTime);
-        Debug.Log(inputVector);
+        if (inputVector != Vector3.zero) // only change rotation if there is movement input
+            transform.forward = Vector3.Slerp(transform.forward, inputVector, Time.deltaTime * rotateSpeed); // make the player face the direction of movement
     }
 }
