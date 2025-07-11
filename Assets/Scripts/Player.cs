@@ -5,42 +5,30 @@ using UnityEngine;
 [System.Serializable]
 public class Player : MonoBehaviour
 {
-    Vector3 inputVector = new Vector3(0, 0, 0);
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float rotateSpeed = 10f;
+
+    [SerializeField] private GameInput gameInput;
+
+
     private bool isWalking = false;
 
     // Update is called once per frame
     private void Update()
     {
-        inputVector = new Vector3(0, 0, 0); // reset inputVector each frame
+        Vector2 inputVector = gameInput.GetMovementVectorNormalized(); // get the normalized movement vector from GameInput
 
-        if (Input.GetKey(KeyCode.W)) // move up
-        {
-            inputVector.z = 1;
-        }
-        if (Input.GetKey(KeyCode.S)) // move down
-        {
-            inputVector.z = -1;
-        }
-        if (Input.GetKey(KeyCode.A)) // move left
-        {
-            inputVector.x = -1;
-        }
-        if (Input.GetKey(KeyCode.D)) // move right
-        {
-            inputVector.x = 1;
-        }
-        inputVector = inputVector.normalized * moveSpeed * Time.deltaTime; // inputVector becomes a normalize vector reflecting the movement direction
-
-        transform.position += inputVector; // move the player in the direction of inputVector
-        if (inputVector != Vector3.zero) // only change rotation if there is movement input
-        {
-            transform.forward = Vector3.Slerp(transform.forward, inputVector, Time.deltaTime * rotateSpeed); // make the player face the direction of movement
-        }
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y); // convert the 2D input vector to a 3D vector for movement
+        transform.position += moveDir * moveSpeed * Time.deltaTime; // inputVector becomes a normalize vector reflecting the movement direction
 
         // animator var
-        isWalking = inputVector != Vector3.zero; // set isWalking to true if there is movement input
+        isWalking = moveDir != Vector3.zero; // set isWalking to true if there is movement input
+
+        if (isWalking) // only change rotation if there is movement input
+        {
+            transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed); // make the player face the direction of movement
+        }
+
     }
 
     public bool IsWalking()
