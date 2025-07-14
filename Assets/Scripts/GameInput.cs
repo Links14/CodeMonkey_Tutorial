@@ -6,11 +6,10 @@ public class GameInput : MonoBehaviour
 {
     private PlayerInputActions playerInputActions;
 
-    private void Awake()
-    {
-        playerInputActions = new PlayerInputActions();
-        playerInputActions.Player.Enable();
-    }
+    private void Awake() { playerInputActions = new PlayerInputActions(); }
+    private void OnEnable() { playerInputActions.Player.Enable(); }
+    private void OnDisable() { playerInputActions.Player.Disable(); }
+    private void OnDestroy() { playerInputActions.Dispose(); }
 
     public Vector2 GetMovementVectorNormalized()
     {
