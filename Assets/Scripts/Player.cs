@@ -7,14 +7,57 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float rotateSpeed = 10f;
-
+    // max distance for interaction raycast
+    [SerializeField] private float interactDistance = 2f;
     [SerializeField] private GameInput gameInput;
+    [SerializeField] private LayerMask countersLayerMask; // LayerMask to filter raycast hits to only ClearCounter objects
 
 
     private bool isWalking = false;
+    private Vector3 lastInteractDir;
 
     // Update is called once per frame
     private void Update()
+    {
+        HandleMovement();
+        HandleInteractions();
+
+    } 
+
+    public bool IsWalking()
+    {
+        return isWalking; // returns true if the player is moving
+    }
+
+    private void HandleInteractions()
+    {
+        Vector2 inputVector = gameInput.GetMovementVectorNormalized(); // get the normalized movement vector from GameInput
+
+        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y); // convert the 2D input vector to a 3D vector for movement
+
+        if (moveDir != Vector3.zero) // if there is movement input
+        {
+            lastInteractDir = moveDir; // save the last interaction direction
+        }
+        else
+        {
+            moveDir = lastInteractDir; // use the last interaction direction if no movement input
+        }
+
+        // Data saved in variable raycastHit can be used to get info about what was hit
+        if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance, countersLayerMask))
+        {
+            Debug.Log(raycastHit.transform);
+
+            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))  // try to get the ClearCounter component from the object hit by the raycast
+            {
+                // has Clear counter
+                clearCounter.Interact(); // call the Interact method on the ClearCounter component
+            }
+        }
+    }
+
+    private void HandleMovement()
     {
         Vector2 inputVector = gameInput.GetMovementVectorNormalized(); // get the normalized movement vector from GameInput
 
@@ -68,11 +111,5 @@ public class Player : MonoBehaviour
         {
             transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed); // make the player face the direction of movement
         }
-
-    } 
-
-    public bool IsWalking()
-    {
-        return isWalking; // returns true if the player is moving
     }
 }
