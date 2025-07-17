@@ -6,6 +6,15 @@ using UnityEngine;
 [System.Serializable]
 public class Player : MonoBehaviour
 {
+    public static Player Instance { get; private set; } // Singleton instance of Player
+
+    public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged; // Event to notify when the selected counter changes
+    public class OnSelectedCounterChangedEventArgs : EventArgs
+    {
+        public ClearCounter selectedCounter; // The currently selected ClearCounter
+    }
+
+
     [SerializeField] private float moveSpeed = 7f;
     [SerializeField] private float rotateSpeed = 10f;
     // max distance for interaction raycast
@@ -16,13 +25,28 @@ public class Player : MonoBehaviour
 
     private bool isWalking = false;
     private Vector3 lastInteractDir;
+    private ClearCounter selectedCounter; // reference to the ClearCounter component
+
+
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogError("Multiple instances of Player detected! Destroying duplicate instance."); // log error if multiple Player instances are found
+            Destroy(gameObject); // Ensure only one instance of Player exists
+            return;
+        }
+        Instance = this; // Set the singleton instance
+    }
+
+
 
     // Update is called once per frame
     private void Update()
     {
         HandleMovement();
         HandleInteractions();
-
     }
 
     private void Start()
@@ -35,7 +59,20 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void GameInput_OnInteractAction(object sender, EventArgs e)
+    private void GameInput_OnInteractAction(object _sender, EventArgs _e)
+    {
+        if (selectedCounter != null) // if a ClearCounter is selected
+        {
+            selectedCounter.Interact(); // call the Interact method on the selected ClearCounter
+        }
+    }
+
+    public bool IsWalking()
+    {
+        return isWalking; // returns true if the player is moving
+    }
+
+    private void HandleInteractions()
     {
         Vector2 inputVector = gameInput.GetMovementVectorNormalized(); // get the normalized movement vector from GameInput
 
@@ -53,24 +90,23 @@ public class Player : MonoBehaviour
         // Data saved in variable raycastHit can be used to get info about what was hit
         if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance, countersLayerMask))
         {
-            Debug.Log(raycastHit.transform);
-
             if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))  // try to get the ClearCounter component from the object hit by the raycast
             {
                 // has Clear counter
-                clearCounter.Interact(); // call the Interact method on the ClearCounter component
+                if (clearCounter != selectedCounter)
+                {
+                    SetSelectedCounter(clearCounter); // set the selected ClearCounter and notify subscribers
+                }
+            }
+            else
+            {
+                SetSelectedCounter(null);
             }
         }
-    }
-
-    public bool IsWalking()
-    {
-        return isWalking; // returns true if the player is moving
-    }
-
-    private void HandleInteractions()
-    {
-
+        else
+        {
+            SetSelectedCounter(null);
+        }
     }
 
     private void HandleMovement()
@@ -127,5 +163,12 @@ public class Player : MonoBehaviour
         {
             transform.forward = Vector3.Slerp(transform.forward, moveDir, Time.deltaTime * rotateSpeed); // make the player face the direction of movement
         }
+    }
+
+    private void SetSelectedCounter(ClearCounter _selectedCounter)
+    {
+        this.selectedCounter = _selectedCounter; // set the selected ClearCounter
+
+        OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs { selectedCounter = _selectedCounter }); // invoke the event to notify subscribers about the change
     }
 }
