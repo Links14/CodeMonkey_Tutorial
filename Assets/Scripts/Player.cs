@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,14 +23,19 @@ public class Player : MonoBehaviour
         HandleMovement();
         HandleInteractions();
 
-    } 
-
-    public bool IsWalking()
-    {
-        return isWalking; // returns true if the player is moving
     }
 
-    private void HandleInteractions()
+    private void Start()
+    {
+        gameInput.OnInteractAction += GameInput_OnInteractAction; // subscribe to the interact action event
+
+        if (countersLayerMask.value == 0)
+        {
+            Debug.LogError("Counters LayerMask is not set! Please assign a valid LayerMask for countersLayerMask in the Player script."); // error if countersLayerMask is not set
+        }
+    }
+
+    private void GameInput_OnInteractAction(object sender, EventArgs e)
     {
         Vector2 inputVector = gameInput.GetMovementVectorNormalized(); // get the normalized movement vector from GameInput
 
@@ -55,6 +61,16 @@ public class Player : MonoBehaviour
                 clearCounter.Interact(); // call the Interact method on the ClearCounter component
             }
         }
+    }
+
+    public bool IsWalking()
+    {
+        return isWalking; // returns true if the player is moving
+    }
+
+    private void HandleInteractions()
+    {
+
     }
 
     private void HandleMovement()
