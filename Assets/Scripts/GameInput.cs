@@ -19,7 +19,7 @@ public class GameInput : MonoBehaviour
     private void OnDestroy() { playerInputActions.Dispose(); }
 
 
-    private void Interact_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    private void Interact_performed(UnityEngine.InputSystem.InputAction.CallbackContext _obj)
     {
         OnInteractAction?.Invoke(this, EventArgs.Empty);
     }
