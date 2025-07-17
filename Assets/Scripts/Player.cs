@@ -28,6 +28,11 @@ public class Player : MonoBehaviour
     private void Start()
     {
         gameInput.OnInteractAction += GameInput_OnInteractAction; // subscribe to the interact action event
+
+        if (countersLayerMask.value == 0)
+        {
+            Debug.LogError("Counters LayerMask is not set! Please assign a valid LayerMask for countersLayerMask in the Player script."); // error if countersLayerMask is not set
+        }
     }
 
     private void GameInput_OnInteractAction(object sender, EventArgs e)
@@ -56,10 +61,6 @@ public class Player : MonoBehaviour
                 clearCounter.Interact(); // call the Interact method on the ClearCounter component
             }
         }
-        else
-        {
-            Debug.Log("No ClearCounter found in range.");
-        }
     }
 
     public bool IsWalking()
@@ -69,29 +70,7 @@ public class Player : MonoBehaviour
 
     private void HandleInteractions()
     {
-        Vector2 inputVector = gameInput.GetMovementVectorNormalized(); // get the normalized movement vector from GameInput
 
-        Vector3 moveDir = new Vector3(inputVector.x, 0f, inputVector.y); // convert the 2D input vector to a 3D vector for movement
-
-        if (moveDir != Vector3.zero) // if there is movement input
-        {
-            lastInteractDir = moveDir; // save the last interaction direction
-        }
-        else
-        {
-            moveDir = lastInteractDir; // use the last interaction direction if no movement input
-        }
-
-        // Data saved in variable raycastHit can be used to get info about what was hit
-        if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDistance, countersLayerMask))
-        {
-            Debug.Log(raycastHit.transform);
-
-            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))  // try to get the ClearCounter component from the object hit by the raycast
-            {
-                // has Clear counter
-            }
-        }
     }
 
     private void HandleMovement()
