@@ -185,6 +185,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: ClearCounter
       objectReference: {fileID: 0}
+    - target: {fileID: 7475456560625919731, guid: e06f7a17347e89d4180c11df5b1716ca,
+        type: 3}
+      propertyPath: kitchenObjectSO
+      value: 
+      objectReference: {fileID: 11400000, guid: d89d57c651651d64b8971f58bd5e1ad3,
+        type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -419,7 +425,7 @@ PrefabInstance:
     - target: {fileID: 1005488725158668089, guid: e06f7a17347e89d4180c11df5b1716ca,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 1005488725158668089, guid: e06f7a17347e89d4180c11df5b1716ca,
         type: 3}
@@ -471,6 +477,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: ClearCounter (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 7475456560625919731, guid: e06f7a17347e89d4180c11df5b1716ca,
+        type: 3}
+      propertyPath: kitchenObjectSO
+      value: 
+      objectReference: {fileID: 11400000, guid: 7621ba13d34d9b1429825000cfe8e7d5,
+        type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
